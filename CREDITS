@@ -2,7 +2,7 @@
 
 Tea4CUPS : Tee for CUPS
 
-(c) 2005-2013 Jerome Alet <alet@librelogiciel.com>
+(c) 2005-2018 Jerome Alet <alet@librelogiciel.com>
 (c) 2005 Peter Stuge <stuge-tea4cups@cdy.org>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -42,6 +42,9 @@ Contributors :
 
   - Peter Stuge : rewrote most of the subprocess management stuff.
   - Frank Koormann : fixed a problem with Python 2.1
+  - Rainer Dorsch and Daniel (?) : fixed a problem with the job
+    billing IPP attribute being an integer. Root cause still
+    unknown...
 
 ==============================================================
 
