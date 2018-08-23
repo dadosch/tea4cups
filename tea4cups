@@ -3,7 +3,7 @@
 
 # Tea4CUPS : Tee for CUPS
 #
-# (c) 2005-2013 Jerome Alet <alet@librelogiciel.com>
+# (c) 2005-2018 Jerome Alet <alet@librelogiciel.com>
 # (c) 2005 Peter Stuge <stuge-tea4cups@cdy.org>
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 
 Licensing terms :
 
-  (c) 2005-2010 Jerome Alet <alet@librelogiciel.com>
+  (c) 2005-2018 Jerome Alet <alet@librelogiciel.com>
   (c) 2005 Peter Stuge <stuge-tea4cups@cdy.org>
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ import fcntl
 import urllib2
 from struct import pack, unpack
 
-__version__ = "3.13alpha_unofficial"
+__version__ = "3.14alpha_unofficial"
 
 class TeeError(Exception):
     """Base exception for Tea4CUPS related stuff."""
@@ -1167,6 +1167,10 @@ class CupsBackend :
         if type(jbing) == type([]) :
             jbing = jbing[-1]
         (dummy, self.JobBilling) = jbing
+        try :
+            self.JobBilling = str(self.JobBilling) # In some cases it seems to be an integer : bug in pkipplib or something else ???
+        except :
+            pass 
 
     def parseIPPRequestFile(self) :
         """Parses the IPP message file and returns a tuple (filename, parsedvalue)."""
