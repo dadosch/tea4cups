@@ -79,7 +79,7 @@ commands you use in pre and post hooks :
 
         None of these environment variables is available to filters.
 
-NB : Tea4CUPS requires a version of Python >= 2.3
+NB : Tea4CUPS requires a version of Python >= 3
 
 =============================================================================
 
