@@ -502,7 +502,7 @@ class IPPRequest:
                     mybuffer.append("  %s : %s" % (name, value))
         if self.data:
             mybuffer.append("IPP datas : %s" % repr(self.data))
-        return "\n".join(mybuffer)
+        return "\n".join(str(mybuffer))
 
     def logDebug(self, msg):
         """Prints a debug message."""
@@ -567,7 +567,19 @@ class IPPRequest:
                                 mybuffer.append(val)
             mybuffer.append(chr(self.tagvalues["end-of-attributes-tag"]))
         mybuffer.append(self.data)
-        return "".join(mybuffer)
+        self.logDebug("mybuffer to str is %s" % str(mybuffer))
+        cleanBuffer=[]
+        for x in mybuffer:
+            if isinstance(x, bytes):
+                self.logDebug("x is bytes: %s" % str(x))
+                cleanBuffer.append(str(x))
+            elif isinstance(x, str):
+                cleanBuffer.append(x)
+            else:
+                self.logDebug("uncatched type of %s " % str(x))
+        self.logDebug("cleanBuffer to str is %s" % str(cleanBuffer))
+        # note: cleanbuffer should be string but must not be parsed to string otherwise \'HTTPResponse\' object is not subscriptable
+        return "\n".join(cleanBuffer)
 
     def parse(self):
         """Parses an IPP Request.
@@ -683,8 +695,6 @@ class CUPS:
         self.charset = charset
         self.language = language
         self.debug = debug
-        self.lastError = None
-        self.lastErrorMessage = None
         self.requestId = None
 
     def getDefaultURL(self):
@@ -694,6 +704,7 @@ class CUPS:
         port = os.environ.get("IPP_PORT") or 631
         if server.startswith("/"):
             # it seems it's a unix domain socket.
+            # TODO
             # we can't handle this right now, so we use the default instead.
             return "http://localhost:%s" % port
         else:
@@ -721,37 +732,33 @@ class CUPS:
                              debug=self.debug)
             req.operation["attributes-charset"] = ("charset", self.charset)
             req.operation["attributes-natural-language"] = ("naturalLanguage", self.language)
+            wrapper.logDebug("charset is set to %s" % req.operation["attributes-charset"])
+            wrapper.logDebug("language is set to %s" % req.operation["attributes-natural-language"])
             return req
 
     def doRequest(self, req, url=None):
         """Sends a request to the CUPS server.
            returns a new IPPRequest object, containing the parsed answer.
         """
-        connexion = urllib2.Request(url=url or self.url, \
-                                    data=req.dump())
-        connexion.add_header("Content-Type", "application/ipp")
-        if self.username:
-            pwmanager = urllib2.HTTPPasswordMgrWithDefaultRealm()
-            pwmanager.add_password(None, \
-                                   "%s%s" % (connexion.get_host(), connexion.get_selector()), \
-                                   self.username, \
-                                   self.password or "")
-            authhandler = urllib2.HTTPBasicAuthHandler(pwmanager)
-            opener = urllib2.build_opener(authhandler)
-            urllib2.install_opener(opener)
-        self.lastError = None
-        self.lastErrorMessage = None
-        try:
-            response = urllib2.urlopen(connexion)
-        except (urllib2.URLError, urllib2.HTTPError, socket.error) as error:
-            self.lastError = error
-            self.lastErrorMessage = str(error)
-            return None
-        else:
-            datas = response.read()
-            ippresponse = IPPRequest(datas)
-            ippresponse.parse()
-            return ippresponse
+        data = req.dump()
+        headers = {'Connection':'close','Content-Type': 'application/ipp','Accept-Encoding':'identity'}
+        auth=None
+        if self.username :
+            auth=(self.username, self.password or "")
+
+        # TODO proper error handling
+
+        r = requests.post(url=url or self.url, auth=auth, data=data, headers=headers, stream=True)
+        r.raw.decode_content=True
+
+        datas = r.raw
+
+        wrapper.logDebug("data to parse: %s" % str(datas))
+        ippresponse = IPPRequest(datas)
+
+        ippresponse.parse()
+        return ippresponse
+
 
     def getPPD(self, queuename):
         """Retrieves the PPD for a particular queuename."""
@@ -782,18 +789,18 @@ class CUPS:
     def getDevices(self):
         """Returns a list of devices as (deviceclass, deviceinfo, devicemakeandmodel, deviceuri) tuples."""
         answer = self.doRequest(self.newRequest(CUPS_GET_DEVICES))
-        return zip([d[1] for d in answer.printer["device-class"]], \
+        return list(zip([d[1] for d in answer.printer["device-class"]], \
                    [d[1] for d in answer.printer["device-info"]], \
                    [d[1] for d in answer.printer["device-make-and-model"]], \
-                   [d[1] for d in answer.printer["device-uri"]])
+                   [d[1] for d in answer.printer["device-uri"]]))
 
     def getPPDs(self):
         """Returns a list of PPDs as (ppdnaturallanguage, ppdmake, ppdmakeandmodel, ppdname) tuples."""
         answer = self.doRequest(self.newRequest(CUPS_GET_PPDS))
-        return zip([d[1] for d in answer.printer["ppd-natural-language"]], \
+        return list(zip([d[1] for d in answer.printer["ppd-natural-language"]], \
                    [d[1] for d in answer.printer["ppd-make"]], \
                    [d[1] for d in answer.printer["ppd-make-and-model"]], \
-                   [d[1] for d in answer.printer["ppd-name"]])
+                   [d[1] for d in answer.printer["ppd-name"]]))
 
     def createSubscription(self, uri, events=["all"],
                            userdata=None,
@@ -1027,13 +1034,11 @@ class CupsBackend:
         """Returns the list of branchtypes branches for a particular section's."""
         branchbasename = "%s_" % branchtype.lower()
         try:
-            globalbranches = [(k, self.config.get("global", k)) for k in self.config.options("global") if
-                              k.startswith(branchbasename)]
+            globalbranches = [(k, self.config.get("global", k)) for k in self.config.options("global") if k.startswith(branchbasename)]
         except configparser.NoSectionError as msg:
             raise ConfigError("Invalid configuration file : %s" % msg)
         try:
-            sectionbranches = [(k, self.config.get(printqueuename, k)) for k in self.config.options(printqueuename) if
-                               k.startswith(branchbasename)]
+            sectionbranches = [(k, self.config.get(printqueuename, k)) for k in self.config.options(printqueuename) if k.startswith(branchbasename)]
         except configparser.NoSectionError as msg:
             self.logInfo("No section for print queue %s : %s" % (printqueuename, msg))
             sectionbranches = []
@@ -1119,8 +1124,7 @@ class CupsBackend:
                             if fullname.startswith('"') and fullname.endswith('"'):
                                 fullname = fullname[1:-1]
                             available.append('%s %s:%s "%s+%s" "%s managed %s"' \
-                                             % (
-                                             devicetype, self.myname, device, self.MyName, name, self.MyName, fullname))
+                                             % (devicetype, self.myname, device, self.MyName, name, self.MyName, fullname))
             os.remove(lockfilename)
         available.append('direct %s:// "%s+Nothing" "%s managed Virtual Printer"' \
                          % (self.myname, self.MyName, self.MyName))
@@ -1140,8 +1144,7 @@ class CupsBackend:
             self.InputFile = None  # read job's datas from stdin
         self.PrinterName = os.environ.get("PRINTER", "")
         self.Directory = self.getPrintQueueOption(self.PrinterName, "directory", ignore=1) or tempfile.gettempdir()
-        self.DataFile = os.path.join(self.Directory,
-                                     "%s-%s-%s-%s" % (self.myname, self.PrinterName, self.UserName, self.JobId))
+        self.DataFile = os.path.join(self.Directory, "%s-%s-%s-%s" % (self.myname, self.PrinterName, self.UserName, self.JobId))
 
         # check that the DEVICE_URI environment variable's value is
         # prefixed with self.myname otherwise don't touch it.
@@ -1195,8 +1198,7 @@ class CupsBackend:
             jbing = jbing[-1]
         (dummy, self.JobBilling) = jbing
         try:
-            self.JobBilling = str(
-                self.JobBilling)  # In some cases it seems to be an integer : bug in pkipplib or something else ???
+            self.JobBilling = str(self.JobBilling)  # In some cases it seems to be an integer : bug in pkipplib or something else ???
         except:
             pass
 
@@ -1416,8 +1418,7 @@ class CupsBackend:
                         exitcode = CUPS_BACKEND_FAILED
                         break
                     else:
-                        self.logInfo(
-                            "%s %s on printer %s didn't exit successfully." % (btypetitle, branch, self.PrinterName),
+                        self.logInfo("%s %s on printer %s didn't exit successfully." % (btypetitle, branch, self.PrinterName),
                             "error")
                         exitcode = CUPS_BACKEND_FAILED
             self.logDebug("End serialized %ss" % btypetitle)
@@ -1436,15 +1437,13 @@ class CupsBackend:
                     retcode = os.WEXITSTATUS(retcode)
                 else:
                     retcode = -1
-                self.logDebug("Exit code for %s %s (PID %s) on printer %s is %s" % (
-                btype, branch, pid, self.PrinterName, retcode))
+                self.logDebug("Exit code for %s %s (PID %s) on printer %s is %s" % (btype, branch, pid, self.PrinterName, retcode))
                 if retcode:
                     if (btype == "prehook") and (retcode == 255):  # -1
                         self.logInfo("Job %s cancelled by prehook %s" % (self.JobId, branch))
                         self.isCancelled = True
                     else:
-                        self.logInfo("%s %s (PID %s) on printer %s didn't exit successfully." % (
-                        btypetitle, branch, pid, self.PrinterName), "error")
+                        self.logInfo("%s %s (PID %s) on printer %s didn't exit successfully." % (btypetitle, branch, pid, self.PrinterName), "error")
                         exitcode = CUPS_BACKEND_FAILED
             self.logDebug("End forked %ss" % btypetitle)
         return exitcode
@@ -1458,8 +1457,7 @@ class CupsBackend:
             try:
                 (number, delay) = [int(p) for p in retry.strip().split(",")]
             except (ValueError, AttributeError, TypeError):
-                self.logInfo("Invalid value '%s' for the 'retry' directive for printer %s in %s." % (
-                retry, self.PrinterName, self.conffile), "error")
+                self.logInfo("Invalid value '%s' for the 'retry' directive for printer %s in %s." % (retry, self.PrinterName, self.conffile), "error")
                 number = 1
                 delay = 0
 
