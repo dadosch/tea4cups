@@ -26,7 +26,7 @@ You can use the AUR package, for example using yay:
 
   0 - Download the latest release from https://codeberg.org/dadosch/tea4cups/releases and extract it.
 
-  1 - Copy the 'tea4cups' file into CUPS' backend directory and give them the right permissions,
+  1 - Copy the `tea4cups` file into CUPS' backend directory and give them the right permissions,
       for example :
 
         $ cp tea4cups /usr/lib/cups/backend
@@ -38,7 +38,7 @@ You can use the AUR package, for example using yay:
      
   3 - Either from CUPS' web interface, add new printers with
       'Tea4CUPS managed' in front of the device's name, or by directly modifying CUPS' printers.conf file, or with the lpadmin command line tool, just prepend each DeviceURI
-      value with ''tea4cups://''.
+      value with `tea4cups://`.
       If you modified printers.conf directly instead of using lpadmin then don't forget to
       restart CUPS.
 
@@ -80,58 +80,45 @@ To help your own commands, Tea4CUPS makes available as part of the
 environment several variables which can be used from the
 commands you use in pre and post hooks :
 
-- ''TEAPRINTERNAME'': The print queue name.
-- ''TEADIRECTORY'': Tea4CUPS output directory.
-- ''TEADATAFILE'': Full name of Tea4CUPS work file (in $TEADIRECTORY).
-- ''TEAJOBSIZE'': Job's size in bytes.
-- ''TEAMD5SUM'': MD5 sum of the job's datas.
-- ''TEACLIENTHOST'': Client's hostname or IP address.
-- ''TEAJOBID'': Job's Id.
-- ''TEAUSERNAME'': Name of the user who launched the print job.
-- ''TEATITLE'': Job's title.
-- ''TEACOPIES'': Number of copies requested.
-- ''TEAOPTIONS'': Options of the print job.
-- ''TEAINPUTFILE'': Print job's data file or empty when job read from stdin.
-- ''TEABILLING'': Job's billing code (lp -o job-billing=SomeCode file.ps)
-- ''TEACONTROLFILE'': Job's IPP message file (usually /var/spool/cups/c?????)
-- ''TEASTATUS'': Original CUPS backend's exit code : ONLY AVAILABLE FROM posthooks, obviously.
+- `TEAPRINTERNAME`: The print queue name.
+- `TEADIRECTORY`: Tea4CUPS output directory.
+- `TEADATAFILE`: Full name of Tea4CUPS work file (in $TEADIRECTORY).
+- `TEAJOBSIZE`: Job's size in bytes.
+- `TEAMD5SUM`: MD5 sum of the job's datas.
+- `TEACLIENTHOST`: Client's hostname or IP address.
+- `TEAJOBID`: Job's Id.
+- `TEAUSERNAME`: Name of the user who launched the print job.
+- `TEATITLE`: Job's title.
+- `TEACOPIES`: Number of copies requested.
+- `TEAOPTIONS`: Options of the print job.
+- `TEAINPUTFILE`: Print job's data file or empty when job read from stdin.
+- `TEABILLING`: Job's billing code (lp -o job-billing=SomeCode file.ps)
+- `TEACONTROLFILE`: Job's IPP message file (usually /var/spool/cups/c?????)
+- `TEASTATUS`: Original CUPS backend's exit code : ONLY AVAILABLE FROM posthooks, obviously.
 
 **None of these environment variables is available to filters.**
 
-NB : Tea4CUPS requires a version of Python >= 3
 
-
-=============================================================================
 
 # Troubleshooting :
 
-  1 - Set "LogLevel debug2" and "MaxLogSize 0" in CUPS' cupsd.conf
+  1 - Set `LogLevel debug2` and `MaxLogSize 0` in CUPS' cupsd.conf
 
   2 - Restart CUPS.
 
-  3 - Set "debug: yes" in the [global] section of tea4cups.conf
+  3 - Set `debug: yes` in the [global] section of tea4cups.conf
 
   4 - Print something on a print queue managed
       by Tea4CUPS.
 
   5 - Look at CUPS' error_log file for diagnostic and error messages.
 
-=============================================================================
-
-CUPS (Common UNIX(r) Printing System) is trademark property of Easy Software
-Products.
-
-You can download CUPS from :
-
-        http://www.cups.org
-
-=============================================================================
-
+# Closing words
+Tea4CUPS requires a version of Python >= 3
+  
 Please report any problem to the bug tracker at https://codeberg.org/dadosch/tea4cups/issues
-
-
+      
 (c) 2005-2018 Jerome Alet <alet@librelogiciel.com>
-
 (c) 2005 Peter Stuge <stuge-tea4cups@cdy.org>
 
 This program is free software; you can redistribute it and/or modify
@@ -147,3 +134,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+
+  
+CUPS (Common UNIX(r) Printing System) is trademark property of Easy Software
+Products.
+
+You can download CUPS from: http://www.cups.org
