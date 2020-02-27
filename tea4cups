@@ -19,14 +19,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-# $Id$
-#
 #
 
 """Tea4CUPS is the Swiss Army's knife of the CUPS Administrator.
 
 
-Licensing terms :
+Licensing terms:
 
   (c) 2005-2018 Jerome Alet <alet@librelogiciel.com>
   (c) 2005 Peter Stuge <stuge-tea4cups@cdy.org>
@@ -45,29 +43,29 @@ Licensing terms :
   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 
-Setup :
+Setup:
 
-  Copy the different files where they belong :
+  Copy the different files where they belong:
 
     $ cp tea4cups /usr/lib/cups/backend/
     $ chown root.root /usr/lib/cups/backend/tea4cups
     $ chmod 700 /usr/lib/cups/backend/tea4cups
     $ cp tea4cups.conf /etc/cupsd/
 
-  Now edit the configuration file to suit your needs :
+  Now edit the configuration file to suit your needs:
 
     $ vi /etc/cupsd/tea4cups.conf
 
-    NB : you can use emacs as well :-)
+    NB: you can use emacs as well :-)
 
-  Finally restart CUPS :
+  Finally restart CUPS:
 
-    $ /etc/init.d/cupsys restart
+    $ systemctl restart org.cups.cupsd
 
   You can now create "Tea4CUPS Managed" print queues from
   CUPS' web interface, or using lpadmin.
 
-Send bug reports to : alet@librelogiciel.com
+Send bug reports to https://codeberg.org/dadosch/tea4cups/issues
 """
 
 import sys

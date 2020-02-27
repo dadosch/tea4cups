@@ -119,6 +119,7 @@ Tea4CUPS requires a version of Python >= 3
 Please report any problem to the bug tracker at https://codeberg.org/dadosch/tea4cups/issues
       
 (c) 2005-2018 Jerome Alet <alet@librelogiciel.com>
+
 (c) 2005 Peter Stuge <stuge-tea4cups@cdy.org>
 
 This program is free software; you can redistribute it and/or modify

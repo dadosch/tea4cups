@@ -1,6 +1,4 @@
-# $Id$
-
-Tea4CUPS : Tee for CUPS
+Tea4CUPS: Tee for CUPS
 
 (c) 2005-2018 Jerome Alet <alet@librelogiciel.com>
 (c) 2005 Peter Stuge <stuge-tea4cups@cdy.org>
@@ -20,7 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 ============================================================
 
-TODO, in no particular order :
+TODO, in no particular order:
 
         - Give some complex examples.
 
