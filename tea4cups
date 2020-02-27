@@ -82,10 +82,8 @@ import shlex
 import tempfile
 import configparser
 import signal
-import socket
 import fcntl
 import requests
-import urllib.parse
 
 from struct import pack, unpack
 
