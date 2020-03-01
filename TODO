@@ -20,6 +20,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 TODO, in no particular order:
 
+        - Use a logging library
+	- Proper error handling for request networking
+	- unix socket support
+	- cups username/password/encryption
         - Give some complex examples.
 
 ============================================================
