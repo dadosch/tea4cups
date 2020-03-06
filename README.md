@@ -117,6 +117,8 @@ commands you use in pre and post hooks :
 Tea4CUPS requires a version of Python >= 3
   
 Please report any problem to the bug tracker at https://codeberg.org/dadosch/tea4cups/issues
+
+(c) 2020 dadosch
       
 (c) 2005-2018 Jerome Alet <alet@librelogiciel.com>
 

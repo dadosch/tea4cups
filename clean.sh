@@ -2,6 +2,7 @@
 
 # Tea4CUPS : Tee for CUPS
 #
+# (c) 2020 dadosch
 # (c) 2005-2018 Jerome Alet <alet@librelogiciel.com>
 # (c) 2005 Peter Stuge <stuge-tea4cups@cdy.org>
 # This program is free software; you can redistribute it and/or modify
